@@ -1,0 +1,201 @@
+{
+    "dataRoles": [
+        {
+            "displayName": "Value",
+            "name": "value",
+            "kind": "Measure",
+            "description": "The value that represents how filled the bar is. Dependent on whether this exceeds the target, the color of the filled area will be different. The colors for this visual can becontrolled in the formattting under Colors - Indicators."
+        },
+        {
+            "displayName": "Target",
+            "name": "target",
+            "kind": "Measure",
+            "description": "The target that you're trying to view if the value passes. This is then used with a ratio against the max to draw where the line should be on the bar."
+        },
+        {
+            "displayName": "Tooltips",
+            "name": "tooltips",
+            "kind": "Measure",
+            "description": ""
+        }
+    ],
+    "objects": {
+        "textSettings": {
+            "displayName": "Data labels",
+            "properties": {
+                "fontSize": {
+                    "displayName": "Text size",
+                    "type": {
+                        "formatting": {
+                            "fontSize": true
+                        }
+                    }
+                },
+                "displayUnits": {
+                    "displayName": "Display units in general",
+                    "type": {
+                        "formatting": {
+                            "labelDisplayUnits": true
+                        }
+                    }
+                },
+                "displayUnitsForValue": {
+                    "displayName": "Display units for value",
+                    "type": {
+                        "formatting": {
+                            "labelDisplayUnits": true
+                        }
+                    }
+                },
+                "displayUnitsForTarget": {
+                    "displayName": "Display units for target",
+                    "type": {
+                        "formatting": {
+                            "labelDisplayUnits": true
+                        }
+                    }
+                },
+                "repPositiveGapAsNegativeNumber": {
+                    "displayName": "Less than gap as negative",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "showPercentagesOnGaps": {
+                    "displayName": "Show percentages on gaps",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "ignoreFormattingForTooltips":
+                {
+                    "displayName": "Ignore formatting on tooltips",
+                    "type": {
+                        "bool": true
+                    }
+                }
+            }
+        },
+        "colorSettings": {
+            "displayName": "Colors - Indicators",
+            "properties": {
+                "lessThanColor": {
+                    "displayName": "Less than",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "equalToColor": {
+                    "displayName": "Equal to",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "greaterThanColor": {
+                    "displayName": "Greater than",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "textLessThanColor": {
+                    "displayName": "Text Less than",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "textEqualToColor": {
+                    "displayName": "Text Equal to",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "textGreaterThanColor": {
+                    "displayName": "Text Greater than",
+                    "type": {
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                },
+                "targetNotDefinedTextColor": {
+                    "displayName": "Text Target not defined",
+                    "type":{
+                        "fill": {
+                            "solid": {
+                                "color": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "targetSettings": {
+            "displayName": "Target",
+            "properties": {
+                "defineTarget": {
+                    "displayName": "Manually define target",
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "value":
+                {
+                    "displayName": "Value for target",
+                    "type": {
+                        "numeric": true
+                    }
+                }
+            }
+        }
+    },
+    "dataViewMappings": [
+        {
+            "conditions": [
+                {
+                    "value": {
+                        "max": 1
+                    },
+                    "target": {
+                        "max": 1
+                    },
+                    "tooltips": {
+                        "max": 20
+                    }
+                }
+            ],
+            "table": {
+                "rows": {
+                    "select": [{"for": { 
+                                    "in": "value"}},
+                               {"for": { 
+                                   "in": "target"}},
+                               { "for": {
+                                   "in": "tooltips"
+                               }}]
+                }
+            }
+        }
+    ]
+}
