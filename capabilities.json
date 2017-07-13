@@ -23,6 +23,12 @@
         "textSettings": {
             "displayName": "Data labels",
             "properties": {
+                "responsive": {
+                    "displayName": "Responsive",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "fontSize": {
                     "displayName": "Text size",
                     "type": {
@@ -72,6 +78,26 @@
                     "displayName": "Ignore formatting on tooltips",
                     "type": {
                         "bool": true
+                    }
+                }
+            }
+        },
+        "kpiStyleSettings": {
+            "displayName": "KPI Style",
+            "properties": {
+                "style": {
+                    "displayName": "Style",
+                    "type": {
+                        "enumeration": [
+                            {   "displayName": "Background",
+                                "value": "background",
+                                "displayNameKey": "0" 
+                            },
+                            {   "displayName": "Text",
+                                "value": "text",
+                                "displayNameKey": "1" 
+                            }
+                        ]
                     }
                 }
             }

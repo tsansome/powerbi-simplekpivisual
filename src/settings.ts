@@ -30,12 +30,14 @@ module powerbi.extensibility.visual {
 
     export class VisualSettings extends DataViewObjectsParser {
         public textSettings: textSettings = new textSettings();
+        public kpiStyleSettings: kpiStyleSettings = new kpiStyleSettings();
         public colorSettings: colorSettings = new colorSettings();
         public targetSettings: targetSettings = new targetSettings();
     }
 
     export class textSettings {
      // Text Size
+      public responsive: boolean = true;
       public fontSize: number = 12;
       public displayUnits: number = 0;
       public displayUnitsForValue: number = 0;
@@ -44,7 +46,10 @@ module powerbi.extensibility.visual {
       public showPercentagesOnGaps: boolean = true;
       public ignoreFormattingForTooltips: boolean = false;
     }
-
+    
+    export class kpiStyleSettings {
+        public style: string = "background";
+    }
     export class colorSettings {
       public lessThanColor: string = "#f44336";
       public equalToColor: string = "#4caf50";

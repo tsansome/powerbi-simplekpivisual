@@ -240,7 +240,7 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
                 var svgWidth = parseInt(this.svg.style("width"))
                 var svgHeight = parseInt(this.svg.style("height"))
 
-                if (data.target != null) {
+                if (data.target != null && this.settings.kpiStyleSettings.style == "background") {
                     this.rectangleBackingElement .append("rect")
                                                 .classed("rectBacking",true)
                                                 .attr("width","100%")
@@ -248,6 +248,10 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
                                                 .style("fill", statusBarColor);
                 }
                 
+                if (this.settings.kpiStyleSettings.style == "text") {
+                    statusFontColor = statusBarColor;
+                }
+
                 this.metricTextElement  .selectAll(".metricText")
                                         .data([data])
                                         .enter()
@@ -262,25 +266,29 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
                 var txtHeight = this.metricTextElement.node().getBBox().height;
                 var txtWidth = this.metricTextElement.node().getBBox().width;
 
-                var i = 2;
-                var textAreaHeight = svgHeight * 0.6
-                var textAreaWidth = svgWidth * 0.6
-                //artifically constrain it to do only 19 loops, so maximum is 19em
-                while ((txtHeight <= textAreaHeight && txtWidth <= textAreaWidth) && i < 19) {
-                    this.metricTextElement.selectAll(".metricTxt").style("font-size", i + "em");
-                    txtHeight = this.metricTextElement.node().getBBox().height;
-                    txtWidth = this.metricTextElement.node().getBBox().width;
-                    i++;
-                }
-                //now if either are greater reduce the text size
-                if (txtHeight > textAreaHeight || txtWidth > textAreaWidth) {
-                    i--;
-                    this.metricTextElement.selectAll(".metricTxt").style("font-size", i + "em");
-                    txtHeight = this.metricTextElement.node().getBBox().height;
-                    txtWidth = this.metricTextElement.node().getBBox().width;
-                }
-                if (i > 18) {
-                    this.metricTextElement.selectAll(".metricTxt").style("font-size", "1em");
+                if (this.settings.textSettings.responsive == true) {
+                    var i = 2;
+                    var textAreaHeight = svgHeight * 0.6
+                    var textAreaWidth = svgWidth * 0.6
+                    //artifically constrain it to do only 19 loops, so maximum is 19em
+                    while ((txtHeight <= textAreaHeight && txtWidth <= textAreaWidth) && i < 19) {
+                        this.metricTextElement.selectAll(".metricTxt").style("font-size", i + "em");
+                        txtHeight = this.metricTextElement.node().getBBox().height;
+                        txtWidth = this.metricTextElement.node().getBBox().width;
+                        i++;
+                    }
+                    //now if either are greater reduce the text size
+                    if (txtHeight > textAreaHeight || txtWidth > textAreaWidth) {
+                        i--;
+                        this.metricTextElement.selectAll(".metricTxt").style("font-size", i + "em");
+                        txtHeight = this.metricTextElement.node().getBBox().height;
+                        txtWidth = this.metricTextElement.node().getBBox().width;
+                    }
+                    if (i > 18) {
+                        this.metricTextElement.selectAll(".metricTxt").style("font-size", "1em");
+                    }
+                } else {
+                    this.metricTextElement.selectAll(".metricTxt").style("font-size", this.settings.textSettings.fontSize + "px");
                 }
                 
                 var horizontalCenterPoint = svgWidth / 2;
