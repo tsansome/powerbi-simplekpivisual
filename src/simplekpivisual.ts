@@ -286,9 +286,13 @@ module powerbi.extensibility.visual {
                     }
                     if (i > 18) {
                         this.metricTextElement.selectAll(".metricTxt").style("font-size", "1em");
+                        txtHeight = this.metricTextElement.node().getBBox().height;
+                        txtWidth = this.metricTextElement.node().getBBox().width;
                     }
                 } else {
                     this.metricTextElement.selectAll(".metricTxt").style("font-size", this.settings.textSettings.fontSize + "px");
+                    txtHeight = this.metricTextElement.node().getBBox().height;
+                    txtWidth = this.metricTextElement.node().getBBox().width;
                 }
                 
                 var horizontalCenterPoint = svgWidth / 2;
