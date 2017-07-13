@@ -1,17 +1,17 @@
 {
   "visual": {
     "name": "simplekpivisual",
-    "displayName": "Simple KPI visual",
+    "displayName": "Simple Responsive KPI visual",
     "guid": "simpleKPI8834183003554B1586236E8CAC1ADBE2",
     "visualClassName": "simplekpivisual",
     "version": "1.0.0",
-    "description": "",
+    "description": "A KPI visual that supports having extra tooltips, tooltips in general plus responsive text sizing! Designed to work brilliantly on both mobile and web. Simply supply the value and the target. Choose the kpi style you want and boom there you have it! A Simple yet effective responsive KPI visual. Happy Power BI visualising!",
     "supportUrl": "",
-    "gitHubUrl": ""
+    "gitHubUrl": "https://github.com/tsansome/powerbi-simplekpivisual"
   },
   "apiVersion": "1.7.0",
   "author": {
-    "name": "",
+    "name": "Travis Sansome",
     "email": ""
   },
   "assets": {
