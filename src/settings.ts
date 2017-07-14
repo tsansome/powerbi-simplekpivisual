@@ -61,6 +61,7 @@ module powerbi.extensibility.visual {
     }
 
     export class targetSettings {
+        public showhide:boolean = true;
         public defineTarget: boolean = false;
         public value: number = 0;
     }

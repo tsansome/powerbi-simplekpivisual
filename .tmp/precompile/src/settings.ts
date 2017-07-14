@@ -61,6 +61,7 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
     }
 
     export class targetSettings {
+        public showhide:boolean = true;
         public defineTarget: boolean = false;
         public value: number = 0;
     }

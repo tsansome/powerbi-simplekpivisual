@@ -180,6 +180,12 @@
         "targetSettings": {
             "displayName": "Target",
             "properties": {
+               "showhide": {
+                    "displayName": "Show / Hide",
+                    "type": {
+                        "bool": true
+                    }
+                },
                 "defineTarget": {
                     "displayName": "Manually define target",
                     "type": {

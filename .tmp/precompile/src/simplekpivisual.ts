@@ -286,9 +286,13 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
                     }
                     if (i > 18) {
                         this.metricTextElement.selectAll(".metricTxt").style("font-size", "1em");
+                        txtHeight = this.metricTextElement.node().getBBox().height;
+                        txtWidth = this.metricTextElement.node().getBBox().width;
                     }
                 } else {
                     this.metricTextElement.selectAll(".metricTxt").style("font-size", this.settings.textSettings.fontSize + "px");
+                    txtHeight = this.metricTextElement.node().getBBox().height;
+                    txtWidth = this.metricTextElement.node().getBBox().width;
                 }
                 
                 var horizontalCenterPoint = svgWidth / 2;
@@ -315,14 +319,14 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
             if (data != null) {
 
                 var toolTipDataBegin = [data.value];
-                if (data.target != null) { toolTipDataBegin.push(data.target); }
+                if (data.target != null && settings.targetSettings.showhide == true) { toolTipDataBegin.push(data.target); }
                 var tooltipDataFieldList = toolTipDataBegin.map(function(f) {
                     return { displayName: f.displayName, value: f.toString(true,useDisplayUnits) }
                 })
 
                 var percentageFormatter = ValueFormatter.create({ format: "0.00 %;-0.00 %;0.00 %", value: 1, allowFormatBeautification: true });
 
-                if (data.target != null) {
+                if (data.target != null && settings.targetSettings.showhide == true) {
                     var formattedGapValueTarget = "";
 
                     var gapTargetField = data.gapBetweenValueAndTarget();

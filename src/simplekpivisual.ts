@@ -319,14 +319,14 @@ module powerbi.extensibility.visual {
             if (data != null) {
 
                 var toolTipDataBegin = [data.value];
-                if (data.target != null) { toolTipDataBegin.push(data.target); }
+                if (data.target != null && settings.targetSettings.showhide == true) { toolTipDataBegin.push(data.target); }
                 var tooltipDataFieldList = toolTipDataBegin.map(function(f) {
                     return { displayName: f.displayName, value: f.toString(true,useDisplayUnits) }
                 })
 
                 var percentageFormatter = ValueFormatter.create({ format: "0.00 %;-0.00 %;0.00 %", value: 1, allowFormatBeautification: true });
 
-                if (data.target != null) {
+                if (data.target != null && settings.targetSettings.showhide == true) {
                     var formattedGapValueTarget = "";
 
                     var gapTargetField = data.gapBetweenValueAndTarget();
