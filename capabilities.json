@@ -200,6 +200,36 @@
                     }
                 }
             }
+        },
+        "headerSettings": {
+            "properties": {
+                "show": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "alignVertical": {
+                    "displayName": "Align - Vertical",
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
+                    }
+                },
+                "alignHorizontal": {
+                    "displayName": "Align - Horizontal",
+                    "type": {
+                        "formatting": {
+                            "alignment": true
+                        }
+                    }
+                },
+                "value": {
+                    "type":{
+                        "text": true
+                    }
+                }                
+            }
         }
     },
     "dataViewMappings": [

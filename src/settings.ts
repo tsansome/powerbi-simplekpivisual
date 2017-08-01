@@ -33,6 +33,7 @@ module powerbi.extensibility.visual {
         public kpiStyleSettings: kpiStyleSettings = new kpiStyleSettings();
         public colorSettings: colorSettings = new colorSettings();
         public targetSettings: targetSettings = new targetSettings();
+        public headerSettings: headerSettings = new headerSettings();
     }
 
     export class textSettings {
@@ -64,5 +65,12 @@ module powerbi.extensibility.visual {
         public showhide:boolean = true;
         public defineTarget: boolean = false;
         public value: number = 0;
+    }
+
+    export class headerSettings {
+        public show:boolean = false;
+        public alignVertical:number = 0;
+        public alignHorizontal:number = 0;
+        public value:string = "";
     }
 }
