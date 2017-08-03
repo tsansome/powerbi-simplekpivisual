@@ -69,8 +69,9 @@ module powerbi.extensibility.visual {
 
     export class headerSettings {
         public show:boolean = false;
-        public alignVertical:number = 0;
+        public position:string = "left";
         public alignHorizontal:number = 0;
         public value:string = "";
+        public fontSize: number = 12;
     }
 }

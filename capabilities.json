@@ -208,12 +208,28 @@
                         "bool": true
                     }
                 },
-                "alignVertical": {
-                    "displayName": "Align - Vertical",
+                "position": {
+                    "displayName": "Position",
                     "type": {
-                        "formatting": {
-                            "alignment": true
-                        }
+                        "enumeration": [
+                            {   "displayName": "Top",
+                                "value": "top",
+                                "displayNameKey": "0" 
+                            },
+                            {   "displayName": "Left",
+                                "value": "left",
+                                "displayNameKey": "1" 
+                            },
+                            {
+                                "displayName": "Right",
+                                "value": "right",
+                                "displayNameKey": "2"
+                            },
+                            {   "displayName": "Bottom",
+                                "value": "bottom",
+                                "displayNameKey": "2" 
+                            }
+                        ]
                     }
                 },
                 "alignHorizontal": {
@@ -225,10 +241,19 @@
                     }
                 },
                 "value": {
+                    "displayName": "Label",
                     "type":{
                         "text": true
                     }
-                }                
+                },
+                "fontSize": {
+                    "displayName": "Font size",
+                    "type":{
+                        "formatting": {
+                            "fontSize": true
+                        }   
+                    }
+                }
             }
         }
     },

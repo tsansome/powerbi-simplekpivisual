@@ -166,6 +166,7 @@ module powerbi.extensibility.visual {
         private host: IVisualHost;
         private rectangleBackingElement;
         private metricTextElement;
+        private headerElement;
 
         private svg: d3.Selection<any>;
         private selectionManager : ISelectionManager;
@@ -239,11 +240,56 @@ module powerbi.extensibility.visual {
                 //Let's derive some of the sizing
                 var svgWidth = parseInt(this.svg.style("width"))
                 var svgHeight = parseInt(this.svg.style("height"))
+                
+                var remainingWidth = svgWidth;
+
+                var headerXPx = null;
+                var headerYPx = null;
+                var padding = 2;
+
+                if (this.settings.headerSettings.show == true) {
+                    
+                    var font_size = this.settings.headerSettings.fontSize;
+                    var position = this.settings.headerSettings.position;
+                    var horizontalAlign = this.settings.headerSettings.alignHorizontal;
+
+                    this.headerElement.append("text")
+                                      .classed("headerText")
+                                      .style("font-size", "1em")
+                                      .attr("x", 1).attr("y",1)
+                    
+                    var headerTxtHeight = this.metricTextElement.node().getBBox().height;
+                    var headerTxtWidth = this.metricTextElement.node().getBBox().width;                    
+                    
+                    if (position == "left") {                        
+                        //align the y to be the center in terms of the
+                        headerXPx = padding;
+                        headerYPx = (svgHeight / 2) + (headerTxtHeight / 2);
+                        this.headerElement.selectAll("headerText").attr("x", headerXPx)
+                                                              .attr("y", headerYPx);
+                        //readjust the remaining width for the visual itself
+                        remainingWidth = svgWidth - (padding + headerTxtWidth + padding);
+
+                    } else if (position == "top") {
+                        //horizontal x needs to be at center
+                        var x = (svgWidth / 2) - (headerTxtWidth / 2)
+                        this.headerElement.selectAll("headerText").attr("x", 2)
+                                                              .attr("y", y);                        
+                    }
+
+                    this.headerElement.selectAll("headerText").attr("x", )
+                                                              .attr("y", )                           
+                }
+                
+                //set the starting x location for the visual
+                var xLocation = svgWidth - remainingWidth;
 
                 if (data.target != null && this.settings.kpiStyleSettings.style == "background") {
+                    var pctWidth = (remainingWidth / svgWidth ) * 100;
                     this.rectangleBackingElement .append("rect")
                                                 .classed("rectBacking",true)
-                                                .attr("width","100%")
+                                                .attr("width",pctWidth+"%")
+                                                .attr("x",xLocation)
                                                 .attr("height","100%")
                                                 .style("fill", statusBarColor);
                 }
@@ -272,31 +318,30 @@ module powerbi.extensibility.visual {
                     var textAreaWidth = svgWidth * 0.6
                     //artifically constrain it to do only 19 loops, so maximum is 19em
                     while ((txtHeight <= textAreaHeight && txtWidth <= textAreaWidth) && i < 19) {
-                        this.metricTextElement.selectAll(".metricTxt").style("font-size", i + "em");
-                        txtHeight = this.metricTextElement.node().getBBox().height;
-                        txtWidth = this.metricTextElement.node().getBBox().width;
+                        this.metricTextElement.selectAll(".metricTxt")
+                                              .style("font-size", i + "em");
                         i++;
                     }
                     //now if either are greater reduce the text size
                     if (txtHeight > textAreaHeight || txtWidth > textAreaWidth) {
                         i--;
-                        this.metricTextElement.selectAll(".metricTxt").style("font-size", i + "em");
-                        txtHeight = this.metricTextElement.node().getBBox().height;
-                        txtWidth = this.metricTextElement.node().getBBox().width;
+                        this.metricTextElement.selectAll(".metricTxt")
+                                              .style("font-size", i + "em");
                     }
                     if (i > 18) {
-                        this.metricTextElement.selectAll(".metricTxt").style("font-size", "1em");
-                        txtHeight = this.metricTextElement.node().getBBox().height;
-                        txtWidth = this.metricTextElement.node().getBBox().width;
+                        this.metricTextElement.selectAll(".metricTxt")
+                                              .style("font-size", "1em");
                     }
                 } else {
-                    this.metricTextElement.selectAll(".metricTxt").style("font-size", this.settings.textSettings.fontSize + "px");
-                    txtHeight = this.metricTextElement.node().getBBox().height;
-                    txtWidth = this.metricTextElement.node().getBBox().width;
+                    this.metricTextElement.selectAll(".metricTxt")
+                                          .style("font-size", this.settings.textSettings.fontSize + "px");
                 }
+
+                txtHeight = this.metricTextElement.node().getBBox().height;
+                txtWidth = this.metricTextElement.node().getBBox().width;
                 
-                var horizontalCenterPoint = svgWidth / 2;
-                var x = horizontalCenterPoint - (txtWidth / 2);
+                var horizontalCenterPoint_buffer = (remainingWidth / 2) - (txtWidth / 2);
+                var x = xLocation + horizontalCenterPoint_buffer;
 
                 var verticalCenterPoint = svgHeight / 2;
                 var y = verticalCenterPoint + (txtHeight / 4);
@@ -375,6 +420,9 @@ module powerbi.extensibility.visual {
             this.svg = container.append("svg")
                                 .attr("width", "100%")
                                 .attr("height", "100%")
+            
+            this.headerElement = this.svg.append("g")
+                                     .classed("header", true);
 
             //draw the text
             this.rectangleBackingElement = this.svg.append("g")
