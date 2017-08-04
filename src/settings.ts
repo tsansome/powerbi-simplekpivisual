@@ -72,6 +72,6 @@ module powerbi.extensibility.visual {
         public position:string = "left";
         public alignHorizontal:number = 0;
         public value:string = "";
-        public fontSize: number = 12;
+        public fontSize: number = 18;
     }
 }

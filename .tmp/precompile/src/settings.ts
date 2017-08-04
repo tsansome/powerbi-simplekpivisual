@@ -33,6 +33,7 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
         public kpiStyleSettings: kpiStyleSettings = new kpiStyleSettings();
         public colorSettings: colorSettings = new colorSettings();
         public targetSettings: targetSettings = new targetSettings();
+        public headerSettings: headerSettings = new headerSettings();
     }
 
     export class textSettings {
@@ -64,5 +65,13 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
         public showhide:boolean = true;
         public defineTarget: boolean = false;
         public value: number = 0;
+    }
+
+    export class headerSettings {
+        public show:boolean = false;
+        public position:string = "left";
+        public alignHorizontal:number = 0;
+        public value:string = "";
+        public fontSize: number = 18;
     }
 }

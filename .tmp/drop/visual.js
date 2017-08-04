@@ -10001,6 +10001,7 @@ var powerbi;
                         _this.kpiStyleSettings = new kpiStyleSettings();
                         _this.colorSettings = new colorSettings();
                         _this.targetSettings = new targetSettings();
+                        _this.headerSettings = new headerSettings();
                         return _this;
                     }
                     return VisualSettings;
@@ -10050,6 +10051,17 @@ var powerbi;
                     return targetSettings;
                 }());
                 simpleKPI8834183003554B1586236E8CAC1ADBE2.targetSettings = targetSettings;
+                var headerSettings = (function () {
+                    function headerSettings() {
+                        this.show = false;
+                        this.position = "left";
+                        this.alignHorizontal = 0;
+                        this.value = "";
+                        this.fontSize = 18;
+                    }
+                    return headerSettings;
+                }());
+                simpleKPI8834183003554B1586236E8CAC1ADBE2.headerSettings = headerSettings;
             })(simpleKPI8834183003554B1586236E8CAC1ADBE2 = visual.simpleKPI8834183003554B1586236E8CAC1ADBE2 || (visual.simpleKPI8834183003554B1586236E8CAC1ADBE2 = {}));
         })(visual = extensibility.visual || (extensibility.visual = {}));
     })(extensibility = powerbi.extensibility || (powerbi.extensibility = {}));
@@ -10217,7 +10229,6 @@ var powerbi;
                             }
                             //configure the display units based on the settings
                             var tS = this.settings.textSettings;
-                            debugger;
                             data.value.displayUnits = tS.displayUnitsForValue != 0 ? tS.displayUnitsForValue : tS.displayUnits;
                             if (data.target != null) {
                                 data.target.displayUnits = tS.displayUnitsForTarget != 0 ? tS.displayUnitsForTarget : tS.displayUnits;
@@ -10244,10 +10255,47 @@ var powerbi;
                             //Let's derive some of the sizing
                             var svgWidth = parseInt(this.svg.style("width"));
                             var svgHeight = parseInt(this.svg.style("height"));
+                            var remainingWidth = svgWidth;
+                            var remainingHeight = svgHeight;
+                            var headerXPx = null;
+                            var headerYPx = null;
+                            var padding = svgHeight * 0.20;
+                            if (this.settings.headerSettings.show == true) {
+                                var font_size = this.settings.headerSettings.fontSize;
+                                var position = this.settings.headerSettings.position;
+                                var horizontalAlign = this.settings.headerSettings.alignHorizontal;
+                                var label = this.settings.headerSettings.value;
+                                var header = this.headerElement.append("text")
+                                    .classed("headerText", true)
+                                    .text(label);
+                                header.style("font-size", font_size + "pt");
+                                var headerTxtHeight = this.headerElement.node().getBBox().height;
+                                var headerTxtWidth = this.headerElement.node().getBBox().width;
+                                if (position == "left") {
+                                    //align the y to be the center in terms of the
+                                    headerXPx = 0;
+                                    headerYPx = (svgHeight / 2) + (headerTxtHeight / 4);
+                                    remainingWidth = svgWidth - (headerTxtWidth + padding);
+                                }
+                                else if (position == "top") {
+                                    //horizontal x needs to be at center
+                                    headerXPx = (svgWidth / 2) - (headerTxtWidth / 2);
+                                    headerYPx = headerTxtHeight;
+                                    remainingHeight = svgHeight - (headerTxtHeight + padding);
+                                }
+                                header.attr("x", headerXPx)
+                                    .attr("y", headerYPx);
+                            }
+                            //set the starting x location for the visual
+                            var xLocation = svgWidth - remainingWidth;
+                            var yLocation = svgHeight - remainingHeight;
                             if (data.target != null && this.settings.kpiStyleSettings.style == "background") {
+                                var pctWidth = (remainingWidth / svgWidth) * 100;
                                 this.rectangleBackingElement.append("rect")
                                     .classed("rectBacking", true)
-                                    .attr("width", "100%")
+                                    .attr("width", pctWidth + "%")
+                                    .attr("x", xLocation)
+                                    .attr("y", yLocation)
                                     .attr("height", "100%")
                                     .style("fill", statusBarColor);
                             }
@@ -10269,10 +10317,11 @@ var powerbi;
                             if (this.settings.textSettings.responsive == true) {
                                 var i = 2;
                                 var textAreaHeight = svgHeight * 0.6;
-                                var textAreaWidth = svgWidth * 0.6;
+                                var textAreaWidth = remainingWidth * 0.6;
                                 //artifically constrain it to do only 19 loops, so maximum is 19em
-                                while ((txtHeight <= textAreaHeight && txtWidth <= textAreaWidth) && i < 19) {
-                                    this.metricTextElement.selectAll(".metricTxt").style("font-size", i + "em");
+                                while ((txtHeight <= textAreaHeight && txtWidth <= textAreaWidth) && i < 20) {
+                                    this.metricTextElement.selectAll(".metricTxt")
+                                        .style("font-size", i + "em");
                                     txtHeight = this.metricTextElement.node().getBBox().height;
                                     txtWidth = this.metricTextElement.node().getBBox().width;
                                     i++;
@@ -10280,25 +10329,30 @@ var powerbi;
                                 //now if either are greater reduce the text size
                                 if (txtHeight > textAreaHeight || txtWidth > textAreaWidth) {
                                     i--;
-                                    this.metricTextElement.selectAll(".metricTxt").style("font-size", i + "em");
+                                    this.metricTextElement.selectAll(".metricTxt")
+                                        .style("font-size", i + "em");
                                     txtHeight = this.metricTextElement.node().getBBox().height;
                                     txtWidth = this.metricTextElement.node().getBBox().width;
                                 }
                                 if (i > 18) {
-                                    this.metricTextElement.selectAll(".metricTxt").style("font-size", "1em");
+                                    this.metricTextElement.selectAll(".metricTxt")
+                                        .style("font-size", "1em");
                                     txtHeight = this.metricTextElement.node().getBBox().height;
                                     txtWidth = this.metricTextElement.node().getBBox().width;
                                 }
                             }
                             else {
-                                this.metricTextElement.selectAll(".metricTxt").style("font-size", this.settings.textSettings.fontSize + "px");
+                                this.metricTextElement.selectAll(".metricTxt")
+                                    .style("font-size", this.settings.textSettings.fontSize + "px");
                                 txtHeight = this.metricTextElement.node().getBBox().height;
                                 txtWidth = this.metricTextElement.node().getBBox().width;
                             }
-                            var horizontalCenterPoint = svgWidth / 2;
-                            var x = horizontalCenterPoint - (txtWidth / 2);
-                            var verticalCenterPoint = svgHeight / 2;
-                            var y = verticalCenterPoint + (txtHeight / 4);
+                            txtHeight = this.metricTextElement.node().getBBox().height;
+                            txtWidth = this.metricTextElement.node().getBBox().width;
+                            var horizontalCenterPoint_buffer = (remainingWidth / 2) - (txtWidth / 2);
+                            var x = xLocation + horizontalCenterPoint_buffer;
+                            var verticalCenterPoint_buffer = (remainingHeight / 2) - (txtHeight / 4);
+                            var y = yLocation + verticalCenterPoint_buffer;
                             this.metricTextElement.selectAll(".metricTxt").attr("x", x + "px")
                                 .attr("y", y + "px");
                             this.tooltipServiceWrapper.addTooltip(this.metricTextElement, function (tooltipEvent) { return simplekpivisual.getToolTipDataForBar(tooltipEvent.data, _this.settings); }, function (tooltipEvent) { return null; });
@@ -10351,6 +10405,8 @@ var powerbi;
                         this.svg = container.append("svg")
                             .attr("width", "100%")
                             .attr("height", "100%");
+                        this.headerElement = this.svg.append("g")
+                            .classed("headerArea", true);
                         //draw the text
                         this.rectangleBackingElement = this.svg.append("g")
                             .classed("rectangleBacking", true);
@@ -10361,6 +10417,7 @@ var powerbi;
                         //clear the visual canvas
                         this.rectangleBackingElement.selectAll(".rectBacking").remove();
                         this.metricTextElement.selectAll(".metricTxt").remove();
+                        this.headerElement.selectAll(".headerText").remove();
                     };
                     simplekpivisual.parseSettings = function (dataView) {
                         return simpleKPI8834183003554B1586236E8CAC1ADBE2.VisualSettings.parse(dataView);
@@ -10386,8 +10443,8 @@ var powerbi;
     (function (visuals) {
         var plugins;
         (function (plugins) {
-            plugins.simpleKPI8834183003554B1586236E8CAC1ADBE2 = {
-                name: 'simpleKPI8834183003554B1586236E8CAC1ADBE2',
+            plugins.simpleKPI8834183003554B1586236E8CAC1ADBE2_DEBUG = {
+                name: 'simpleKPI8834183003554B1586236E8CAC1ADBE2_DEBUG',
                 displayName: 'Simple Responsive KPI visual',
                 class: 'simplekpivisual',
                 version: '1.0.0',
