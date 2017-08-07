@@ -245,7 +245,12 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
 
                 var headerXPx = null;
                 var headerYPx = null;
-                var padding = svgHeight * 0.20;
+                var padding = 5;
+
+                var y_min = 0;
+                var x_min = 0;
+                var y_max = svgHeight;
+                var x_max = svgWidth;
 
                 if (this.settings.headerSettings.show == true) {
                     
@@ -268,12 +273,36 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
                         headerXPx = 0;
                         headerYPx = (svgHeight / 2) + (headerTxtHeight / 4);
                         remainingWidth = svgWidth - (headerTxtWidth + padding);
-
+                        
+                        //only need to set x_min
+                        x_min = (headerTxtWidth + padding);
+                        
                     } else if (position == "top") {
                         //horizontal x needs to be at center
                         headerXPx = (svgWidth / 2) - (headerTxtWidth / 2)   
                         headerYPx = headerTxtHeight                     
-                        remainingHeight = svgHeight - (headerTxtHeight + padding);
+                        remainingHeight = svgHeight - (padding + headerTxtHeight + padding);
+
+                        //only need to set y_min
+                        y_min = padding + headerTxtHeight + padding;
+
+                    } else if (position == "right") {
+                        //align the y to be the center in terms of the
+                        headerXPx = svgWidth - headerTxtWidth;
+                        headerYPx = (svgHeight / 2) + (headerTxtHeight / 4);
+                        remainingWidth = svgWidth - (headerTxtWidth + padding);
+
+                        //now we need to set x_max
+                        x_max = svgWidth - (headerTxtWidth + padding);
+                    }
+                    else if (position == "bottom") {
+                        //horizontal x needs to be at center
+                        headerXPx = (svgWidth / 2) - (headerTxtWidth / 2)   
+                        headerYPx = svgHeight - padding;                     
+                        remainingHeight = svgHeight - (padding + headerTxtHeight + padding);
+
+                        //only need to set y_min
+                        y_max = svgHeight - (padding + headerTxtHeight + padding);
                     }
 
                     header.attr("x", headerXPx)
@@ -281,18 +310,15 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
 
                 }
                 
-                //set the starting x location for the visual
-                var xLocation = svgWidth - remainingWidth;
-                var yLocation = svgHeight - remainingHeight;
-
                 if (data.target != null && this.settings.kpiStyleSettings.style == "background") {
-                    var pctWidth = (remainingWidth / svgWidth ) * 100;
+                    var width = (x_max - x_min)+"px";
+                    var height = (y_max - y_min)+"px";
                     this.rectangleBackingElement .append("rect")
                                                 .classed("rectBacking",true)
-                                                .attr("width",pctWidth+"%")
-                                                .attr("x",xLocation)
-                                                .attr("y",yLocation)
-                                                .attr("height","100%")
+                                                .attr("width",width)
+                                                .attr("x",x_min)
+                                                .attr("y",y_min)
+                                                .attr("height",height)
                                                 .style("fill", statusBarColor);
                 }
                 
@@ -351,10 +377,10 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
                 txtWidth = this.metricTextElement.node().getBBox().width;
                 
                 var horizontalCenterPoint_buffer = (remainingWidth / 2) - (txtWidth / 2);
-                var x = xLocation + horizontalCenterPoint_buffer;
+                var x = x_min + horizontalCenterPoint_buffer;
 
-                var verticalCenterPoint_buffer =  (remainingHeight / 2) - (txtHeight / 4);
-                var y = yLocation + verticalCenterPoint_buffer;
+                var verticalCenterPoint_buffer =  (remainingHeight / 2) + (txtHeight / 4);
+                var y = y_min + verticalCenterPoint_buffer;
 
                 this.metricTextElement.selectAll(".metricTxt").attr("x", x + "px")
                                                               .attr("y", y + "px");
