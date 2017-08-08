@@ -10465,8 +10465,8 @@ var powerbi;
     (function (visuals) {
         var plugins;
         (function (plugins) {
-            plugins.simpleKPI8834183003554B1586236E8CAC1ADBE2_DEBUG = {
-                name: 'simpleKPI8834183003554B1586236E8CAC1ADBE2_DEBUG',
+            plugins.simpleKPI8834183003554B1586236E8CAC1ADBE2 = {
+                name: 'simpleKPI8834183003554B1586236E8CAC1ADBE2',
                 displayName: 'Simple Responsive KPI visual',
                 class: 'simplekpivisual',
                 version: '1.0.0',
