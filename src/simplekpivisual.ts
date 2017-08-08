@@ -86,6 +86,25 @@ module powerbi.extensibility.visual {
         }
     }
 
+    export class Area {
+        x_min:number;
+        x_max:number;
+        y_min:number;
+        y_max:number;
+        public constructor(x_min, x_max, y_min, y_max) {
+            this.x_min = x_min;
+            this.x_max = x_max;
+            this.y_min = y_min;
+            this.y_max = y_max;
+        }
+        public width(): number {
+            return this.x_max - this.x_min;
+        }
+        public height(): number {
+            return this.y_max - this.y_min;
+        }
+    }
+
     /**
      * Function that converts queried data into a view model that will be used by the visual
      *
@@ -247,10 +266,7 @@ module powerbi.extensibility.visual {
                 var headerYPx = null;
                 var padding = 5;
 
-                var y_min = 0;
-                var x_min = 0;
-                var y_max = svgHeight;
-                var x_max = svgWidth;
+                var SquareArea = new Area(0, svgWidth, 0, svgHeight);
 
                 if (this.settings.headerSettings.show == true) {
                     
@@ -265,60 +281,56 @@ module powerbi.extensibility.visual {
 
                     header.style("font-size",font_size + "pt");
                     
-                    var headerTxtHeight = this.headerElement.node().getBBox().height;
-                    var headerTxtWidth = this.headerElement.node().getBBox().width;                    
+                    var headerElemWidth = this.headerElement.node().getBBox().width;
+                    var headerElemHeight = this.headerElement.node().getBBox().height;
                     
+                    var headerTxtArea = new Area(0, headerElemWidth, 0, headerElemHeight);
+                    var headerXPx = null;
+                    var headerYPx = null;
                     if (position == "left") {                        
                         //align the y to be the center in terms of the
                         headerXPx = 0;
-                        headerYPx = (svgHeight / 2) + (headerTxtHeight / 4);
-                        remainingWidth = svgWidth - (headerTxtWidth + padding);
-                        
-                        //only need to set x_min
-                        x_min = (headerTxtWidth + padding);
-                        
+                        headerTxtArea.y_max = (svgHeight / 2) + (headerElemHeight / 4);
+                        headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
+                        //only need to set x_min for the square area
+                        SquareArea.x_min = (headerElemWidth + padding);                        
                     } else if (position == "top") {
                         //horizontal x needs to be at center
-                        headerXPx = (svgWidth / 2) - (headerTxtWidth / 2)   
-                        headerYPx = headerTxtHeight                     
-                        remainingHeight = svgHeight - (padding + headerTxtHeight + padding);
-
-                        //only need to set y_min
-                        y_min = padding + headerTxtHeight + padding;
-
+                        headerTxtArea.x_min = (svgWidth / 2) - (headerElemWidth / 2)
+                        headerTxtArea.x_max = headerTxtArea.x_min + headerElemWidth;
+                        //only need to set y_min for the square area
+                        SquareArea.y_min = padding + headerElemHeight + padding;
                     } else if (position == "right") {
                         //align the y to be the center in terms of the
-                        headerXPx = svgWidth - headerTxtWidth;
-                        headerYPx = (svgHeight / 2) + (headerTxtHeight / 4);
-                        remainingWidth = svgWidth - (headerTxtWidth + padding);
-
-                        //now we need to set x_max
-                        x_max = svgWidth - (headerTxtWidth + padding);
+                        headerTxtArea.x_min = svgWidth - headerTxtArea.width();
+                        headerTxtArea.x_max = svgWidth;
+                        headerTxtArea.y_max = (svgHeight / 2) + (headerTxtArea.height() / 4);
+                        headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
+                        //now we need to set x_max for the square area
+                        SquareArea.x_max = svgWidth - (headerElemWidth + padding);
                     }
                     else if (position == "bottom") {
                         //horizontal x needs to be at center
-                        headerXPx = (svgWidth / 2) - (headerTxtWidth / 2)   
-                        headerYPx = svgHeight - padding;                     
-                        remainingHeight = svgHeight - (padding + headerTxtHeight + padding);
-
-                        //only need to set y_min
-                        y_max = svgHeight - (padding + headerTxtHeight + padding);
+                        headerTxtArea.x_min = (svgWidth / 2) - (headerTxtArea.width() / 2);
+                        headerTxtArea.x_max = headerTxtArea.x_min + headerElemWidth;
+                        headerTxtArea.y_max = svgHeight - padding;
+                        headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
+                        //only need to set y_min for the square
+                        SquareArea.y_max = svgHeight - (padding + headerTxtArea.height());
                     }
 
-                    header.attr("x", headerXPx)
-                          .attr("y", headerYPx);
+                    header.attr("x", headerTxtArea.x_min)
+                          .attr("y", headerTxtArea.y_max);
 
                 }
                 
                 if (data.target != null && this.settings.kpiStyleSettings.style == "background") {
-                    var width = (x_max - x_min)+"px";
-                    var height = (y_max - y_min)+"px";
                     this.rectangleBackingElement .append("rect")
                                                 .classed("rectBacking",true)
-                                                .attr("width",width)
-                                                .attr("x",x_min)
-                                                .attr("y",y_min)
-                                                .attr("height",height)
+                                                .attr("width", SquareArea.width())
+                                                .attr("height", SquareArea.height())
+                                                .attr("x", SquareArea.x_min)
+                                                .attr("y", SquareArea.y_min)
                                                 .style("fill", statusBarColor);
                 }
                 
@@ -376,11 +388,11 @@ module powerbi.extensibility.visual {
                 txtHeight = this.metricTextElement.node().getBBox().height;
                 txtWidth = this.metricTextElement.node().getBBox().width;
                 
-                var horizontalCenterPoint_buffer = (remainingWidth / 2) - (txtWidth / 2);
-                var x = x_min + horizontalCenterPoint_buffer;
+                var horizontalCenterPoint_buffer = (SquareArea.width() / 2) - (txtWidth / 2);
+                var x = SquareArea.x_min + horizontalCenterPoint_buffer;
 
-                var verticalCenterPoint_buffer =  (remainingHeight / 2) + (txtHeight / 4);
-                var y = y_min + verticalCenterPoint_buffer;
+                var verticalCenterPoint_buffer =  (SquareArea.height() / 2) + (txtHeight / 4);
+                var y = SquareArea.y_min + verticalCenterPoint_buffer;
 
                 this.metricTextElement.selectAll(".metricTxt").attr("x", x + "px")
                                                               .attr("y", y + "px");
