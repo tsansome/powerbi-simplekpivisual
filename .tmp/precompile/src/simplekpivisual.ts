@@ -248,7 +248,7 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
 
                 //Let's derive some of the sizing
 
-                var margin_between_items = 5;
+                var margin_between_items = this.settings.headerSettings.margin_between;
 
                 var SquareArea = new Area(0, parseInt(this.svg.style("width")), 0, parseInt(this.svg.style("height")));
 

@@ -10060,6 +10060,7 @@ var powerbi;
                         this.alignHorizontal = 0;
                         this.value = "";
                         this.fontSize = 18;
+                        this.margin_between = 5;
                     }
                     return headerSettings;
                 }());
@@ -10272,7 +10273,7 @@ var powerbi;
                             //we need to derive the backing rectangle colour
                             var stColor = this.derive_status_color(data.value, data.target);
                             //Let's derive some of the sizing
-                            var margin_between_items = 5;
+                            var margin_between_items = this.settings.headerSettings.margin_between;
                             var SquareArea = new Area(0, parseInt(this.svg.style("width")), 0, parseInt(this.svg.style("height")));
                             if (this.settings.headerSettings.show == true) {
                                 var label = this.settings.headerSettings.value;

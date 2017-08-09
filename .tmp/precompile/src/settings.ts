@@ -75,6 +75,7 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
         public alignHorizontal:number = 0;
         public value:string = "";
         public fontSize: number = 18;
+        public margin_between: number = 5;
     }
 
     export class headerWhenSmallSettings {

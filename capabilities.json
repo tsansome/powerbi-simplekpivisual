@@ -261,6 +261,12 @@
                             "fontSize": true
                         }   
                     }
+                },
+                "margin_between": {
+                    "displayName": "Margin between header and items",
+                    "type": {
+                        "numeric": true
+                    }
                 }
             }
         },
