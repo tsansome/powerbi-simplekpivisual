@@ -80,6 +80,7 @@ module powerbi.extensibility.visual {
     export class headerWhenSmallSettings {
         public show:boolean = false;
         public threshold: number = 100;
-        public numberOfCharacters: number = 2;
+        public fontSize: number = 12;
+        public value: string = "";        
     }
 }

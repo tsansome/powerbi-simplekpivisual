@@ -257,17 +257,16 @@ module powerbi.extensibility.visual {
                 if (this.settings.headerSettings.show == true) {
                     
                     var label = this.settings.headerSettings.value;
+                    var font_size = this.settings.headerSettings.fontSize;          
 
                     //now do an adjustment to the number of characters shown - primarily for mobile visualisation
                     if (this.settings.headerWhenSmallSettings.show == true && this.settings.headerWhenSmallSettings.threshold != null) {
                         if (this.settings.headerWhenSmallSettings.threshold > SquareArea.width()) {
-                            if (this.settings.headerWhenSmallSettings.numberOfCharacters != null) {
-                                label = label.substr(0, this.settings.headerWhenSmallSettings.numberOfCharacters);
-                            }
+                            label = this.settings.headerWhenSmallSettings.value != null ? this.settings.headerWhenSmallSettings.value : label;
+                            font_size = this.settings.headerWhenSmallSettings.fontSize != null ? this.settings.headerWhenSmallSettings.fontSize : font_size;
                         }
                     }
 
-                    var font_size = this.settings.headerSettings.fontSize;          
                     var header = this.headerElement.append("text")
                                 .classed("headerText",true)
                                 .text(label);

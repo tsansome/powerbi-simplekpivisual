@@ -276,12 +276,20 @@
                         "numeric": true
                     }
                 },
-                "numberOfCharacters": {
-                    "displayName": "Number of characters",
-                    "type": {
-                        "numeric": true
+                "fontSize": {
+                    "displayName": "Font size",
+                    "type":{
+                        "formatting": {
+                            "fontSize": true
+                        }   
                     }
-                }
+                },
+                "value": {
+                    "displayName": "Label",
+                    "type":{
+                        "text": true
+                    }
+                }                
             }
         }
     },
