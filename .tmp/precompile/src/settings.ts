@@ -34,11 +34,13 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
         public colorSettings: colorSettings = new colorSettings();
         public targetSettings: targetSettings = new targetSettings();
         public headerSettings: headerSettings = new headerSettings();
+        public headerWhenSmallSettings: headerWhenSmallSettings = new headerWhenSmallSettings();
     }
 
     export class textSettings {
      // Text Size
       public responsive: boolean = true;
+      public percentageOfArea:number = 0.6;
       public fontSize: number = 12;
       public displayUnits: number = 0;
       public displayUnitsForValue: number = 0;
@@ -73,5 +75,11 @@ module powerbi.extensibility.visual.simpleKPI8834183003554B1586236E8CAC1ADBE2  {
         public alignHorizontal:number = 0;
         public value:string = "";
         public fontSize: number = 18;
+    }
+
+    export class headerWhenSmallSettings {
+        public show:boolean = false;
+        public threshold: number = 100;
+        public numberOfCharacters: number = 2;
     }
 }

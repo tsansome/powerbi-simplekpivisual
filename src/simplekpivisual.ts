@@ -105,6 +105,11 @@ module powerbi.extensibility.visual {
         }
     }
 
+    export class StatusColor {
+        public barColor: string;
+        public fontColor: string;
+    }
+
     /**
      * Function that converts queried data into a view model that will be used by the visual
      *
@@ -217,7 +222,7 @@ module powerbi.extensibility.visual {
                 //print out the error message
             } else {
                 var data = transform.data;
-
+                
                 //now if the target has been set to be defined in the settings we need to update it
                 if (this.settings.targetSettings.defineTarget) {
                     if (data.target == null) {
@@ -239,88 +244,52 @@ module powerbi.extensibility.visual {
                 }                
 
                 //we need to derive the backing rectangle colour
-                var statusBarColor = this.settings.colorSettings.equalToColor;
-                var statusFontColor = this.settings.colorSettings.textEqualToColor;
-
-                if (data.target != null) {
-                    if (data.value.value > data.target.value) {
-                        statusBarColor = this.settings.colorSettings.greaterThanColor
-                        statusFontColor = this.settings.colorSettings.textGreaterThanColor;
-                    } 
-                    else if (data.value.value < data.target.value) {
-                        statusBarColor = this.settings.colorSettings.lessThanColor;
-                        statusFontColor = this.settings.colorSettings.textLessThanColor;
-                    }
-                } else {
-                    statusFontColor = this.settings.colorSettings.targetNotDefinedTextColor;
-                }
+                var stColor = this.derive_status_color(data.value, data.target);
 
                 //Let's derive some of the sizing
-                var svgWidth = parseInt(this.svg.style("width"))
-                var svgHeight = parseInt(this.svg.style("height"))
-                
-                var remainingWidth = svgWidth;
-                var remainingHeight = svgHeight;
 
-                var headerXPx = null;
-                var headerYPx = null;
-                var padding = 5;
+                var margin_between_items = 5;
 
-                var SquareArea = new Area(0, svgWidth, 0, svgHeight);
+                var SquareArea = new Area(0, parseInt(this.svg.style("width")), 0, parseInt(this.svg.style("height")));
 
                 if (this.settings.headerSettings.show == true) {
                     
-                    var font_size = this.settings.headerSettings.fontSize;
-                    var position = this.settings.headerSettings.position;
-                    var horizontalAlign = this.settings.headerSettings.alignHorizontal;
                     var label = this.settings.headerSettings.value;
-                    
+
+                    //now do an adjustment to the number of characters shown - primarily for mobile visualisation
+                    if (this.settings.headerWhenSmallSettings.show == true && this.settings.headerWhenSmallSettings.threshold != null) {
+                        if (this.settings.headerWhenSmallSettings.threshold > SquareArea.width()) {
+                            if (this.settings.headerWhenSmallSettings.numberOfCharacters != null) {
+                                label = label.substr(0, this.settings.headerWhenSmallSettings.numberOfCharacters);
+                            }
+                        }
+                    }
+
+                    var font_size = this.settings.headerSettings.fontSize;          
                     var header = this.headerElement.append("text")
-                                      .classed("headerText",true)
-                                      .text(label);
+                                .classed("headerText",true)
+                                .text(label);
 
                     header.style("font-size",font_size + "pt");
                     
-                    var headerElemWidth = this.headerElement.node().getBBox().width;
-                    var headerElemHeight = this.headerElement.node().getBBox().height;
+                    var position = this.settings.headerSettings.position;
+                    var headerArea = this.position_header(position);
                     
-                    var headerTxtArea = new Area(0, headerElemWidth, 0, headerElemHeight);
-                    var headerXPx = null;
-                    var headerYPx = null;
-                    if (position == "left") {                        
-                        //align the y to be the center in terms of the
-                        headerXPx = 0;
-                        headerTxtArea.y_max = (svgHeight / 2) + (headerElemHeight / 4);
-                        headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
-                        //only need to set x_min for the square area
-                        SquareArea.x_min = (headerElemWidth + padding);                        
-                    } else if (position == "top") {
-                        //horizontal x needs to be at center
-                        headerTxtArea.x_min = (svgWidth / 2) - (headerElemWidth / 2)
-                        headerTxtArea.x_max = headerTxtArea.x_min + headerElemWidth;
-                        //only need to set y_min for the square area
-                        SquareArea.y_min = padding + headerElemHeight + padding;
-                    } else if (position == "right") {
-                        //align the y to be the center in terms of the
-                        headerTxtArea.x_min = svgWidth - headerTxtArea.width();
-                        headerTxtArea.x_max = svgWidth;
-                        headerTxtArea.y_max = (svgHeight / 2) + (headerTxtArea.height() / 4);
-                        headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
-                        //now we need to set x_max for the square area
-                        SquareArea.x_max = svgWidth - (headerElemWidth + padding);
-                    }
-                    else if (position == "bottom") {
-                        //horizontal x needs to be at center
-                        headerTxtArea.x_min = (svgWidth / 2) - (headerTxtArea.width() / 2);
-                        headerTxtArea.x_max = headerTxtArea.x_min + headerElemWidth;
-                        headerTxtArea.y_max = svgHeight - padding;
-                        headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
-                        //only need to set y_min for the square
-                        SquareArea.y_max = svgHeight - (padding + headerTxtArea.height());
-                    }
+                    header.attr("x", headerArea.x_min)
+                          .attr("y", headerArea.y_max);
 
-                    header.attr("x", headerTxtArea.x_min)
-                          .attr("y", headerTxtArea.y_max);
+                    switch(this.settings.headerSettings.position) {
+                        case "left": SquareArea.x_min = headerArea.x_max + margin_between_items;
+                                     break;
+                        case "right": SquareArea.x_max = SquareArea.width() - (headerArea.width() + margin_between_items);
+                                     break;
+                        case "top":  SquareArea.y_min = margin_between_items + headerArea.height() + margin_between_items;
+                                     break;
+                        case "bottom": SquareArea.y_max = SquareArea.height() - (margin_between_items + headerArea.height());
+                                       break;   
+                        default:
+                            throw new Error("Somehow the position wasn't set to one of the available values.");
+                    }                                        
 
                 }
                 
@@ -331,11 +300,7 @@ module powerbi.extensibility.visual {
                                                 .attr("height", SquareArea.height())
                                                 .attr("x", SquareArea.x_min)
                                                 .attr("y", SquareArea.y_min)
-                                                .style("fill", statusBarColor);
-                }
-                
-                if (this.settings.kpiStyleSettings.style == "text") {
-                    statusFontColor = statusBarColor;
+                                                .style("fill", stColor.barColor);
                 }
 
                 this.metricTextElement  .selectAll(".metricText")
@@ -345,53 +310,22 @@ module powerbi.extensibility.visual {
                                         .classed("metricTxt",true) 
                                         .text(data.value.toString(true, true))
                                         .style("font-family","'Segoe UI', 'wf_segoe-ui_normal', helvetica, arial, sans-serif;")
-                                        .style("fill", statusFontColor)
+                                        .style("fill", stColor.fontColor)
                                         .style("font-size","1em");
                 
-                //now scale the text based on the width / height                
-                var txtHeight = this.metricTextElement.node().getBBox().height;
-                var txtWidth = this.metricTextElement.node().getBBox().width;
-                
+                //if responsive resize the text to fit in the square area                
                 if (this.settings.textSettings.responsive == true) {
-                    var i = 2;
-                    var textAreaHeight = svgHeight * 0.6
-                    var textAreaWidth = remainingWidth * 0.6
-                    //artifically constrain it to do only 19 loops, so maximum is 19em
-                    while ((txtHeight <= textAreaHeight && txtWidth <= textAreaWidth) && i < 20) {
-                        this.metricTextElement.selectAll(".metricTxt")
-                                              .style("font-size", i + "em");
-                        txtHeight = this.metricTextElement.node().getBBox().height;
-                        txtWidth = this.metricTextElement.node().getBBox().width;
-                        i++;
-                    }
-                    //now if either are greater reduce the text size
-                    if (txtHeight > textAreaHeight || txtWidth > textAreaWidth) {
-                        i--;
-                        this.metricTextElement.selectAll(".metricTxt")
-                                              .style("font-size", i + "em");
-                        txtHeight = this.metricTextElement.node().getBBox().height;
-                        txtWidth = this.metricTextElement.node().getBBox().width;
-                    }
-                    if (i > 18) {
-                        this.metricTextElement.selectAll(".metricTxt")
-                                              .style("font-size", "1em");
-                        txtHeight = this.metricTextElement.node().getBBox().height;
-                        txtWidth = this.metricTextElement.node().getBBox().width;
-                    }
+                    var percentage = this.settings.textSettings.percentageOfArea > 1 ? 1 : this.settings.textSettings.percentageOfArea;
+                    this.resize_text(SquareArea, percentage);
                 } else {
                     this.metricTextElement.selectAll(".metricTxt")
                                           .style("font-size", this.settings.textSettings.fontSize + "px");
-                    txtHeight = this.metricTextElement.node().getBBox().height;
-                    txtWidth = this.metricTextElement.node().getBBox().width;
                 }
 
-                txtHeight = this.metricTextElement.node().getBBox().height;
-                txtWidth = this.metricTextElement.node().getBBox().width;
-                
-                var horizontalCenterPoint_buffer = (SquareArea.width() / 2) - (txtWidth / 2);
+                var horizontalCenterPoint_buffer = (SquareArea.width() / 2) - ((this.metricTextElement.node().getBBox().width) / 2);
                 var x = SquareArea.x_min + horizontalCenterPoint_buffer;
 
-                var verticalCenterPoint_buffer =  (SquareArea.height() / 2) + (txtHeight / 4);
+                var verticalCenterPoint_buffer =  (SquareArea.height() / 2) + ((this.metricTextElement.node().getBBox().height) / 4);
                 var y = SquareArea.y_min + verticalCenterPoint_buffer;
 
                 this.metricTextElement.selectAll(".metricTxt").attr("x", x + "px")
@@ -486,6 +420,104 @@ module powerbi.extensibility.visual {
             this.metricTextElement.selectAll(".metricTxt").remove()
             this.headerElement.selectAll(".headerText").remove()
 
+        }
+
+        private position_header(position) : Area {           
+            
+            var horizontalAlign = this.settings.headerSettings.alignHorizontal;
+            
+            var svgWidth = parseInt(this.svg.style("width"));
+            var svgHeight = parseInt(this.svg.style("height"));
+            
+            var headerElemWidth = this.headerElement.node().getBBox().width;
+            var headerElemHeight = this.headerElement.node().getBBox().height;
+            
+            var headerTxtArea = new Area(0, headerElemWidth, 0, headerElemHeight);
+            var headerXPx = null;
+            var headerYPx = null;
+            if (position == "left") {                        
+                //align the y to be the center in terms of the
+                headerXPx = 0;
+                headerTxtArea.y_max = (svgHeight / 2) + (headerElemHeight / 4);
+                headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
+                //only need to set x_min for the square area
+                                     
+            } else if (position == "top") {
+                //horizontal x needs to be at center
+                headerTxtArea.x_min = (svgWidth / 2) - (headerElemWidth / 2)
+                headerTxtArea.x_max = headerTxtArea.x_min + headerElemWidth;
+                //only need to set y_min for the square area
+                
+            } else if (position == "right") {
+                //align the y to be the center in terms of the
+                headerTxtArea.x_min = svgWidth - headerTxtArea.width();
+                headerTxtArea.x_max = svgWidth;
+                headerTxtArea.y_max = (svgHeight / 2) + (headerTxtArea.height() / 4);
+                headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
+                //now we need to set x_max for the square area
+                
+            }
+            else if (position == "bottom") {
+                //horizontal x needs to be at center
+                headerTxtArea.x_min = (svgWidth / 2) - (headerTxtArea.width() / 2);
+                headerTxtArea.x_max = headerTxtArea.x_min + headerElemWidth;
+                headerTxtArea.y_max = svgHeight - 5;
+                headerTxtArea.y_min = headerTxtArea.y_max - headerElemHeight;
+                //only need to set y_min for the square
+                
+            }
+
+            return headerTxtArea;
+        }
+
+        private derive_status_color(value, target?): StatusColor {
+            var stColor = new StatusColor();
+            stColor.barColor = this.settings.colorSettings.equalToColor;
+            stColor.fontColor = this.settings.colorSettings.textEqualToColor;
+
+            if (target != null) {
+                if (value.value > target.value) {
+                    stColor.barColor = this.settings.colorSettings.greaterThanColor
+                    stColor.fontColor = this.settings.colorSettings.textGreaterThanColor;
+                } 
+                else if (value.value < target.value) {
+                    stColor.barColor = this.settings.colorSettings.lessThanColor;
+                    stColor.fontColor = this.settings.colorSettings.textLessThanColor;
+                }
+            } else {
+                stColor.fontColor = this.settings.colorSettings.targetNotDefinedTextColor;
+            }
+                
+            if (this.settings.kpiStyleSettings.style == "text") {
+                stColor.fontColor = stColor.barColor;
+            }
+
+            return stColor;
+        }
+
+        private resize_text(area_to_fit_in:Area, percentageOfArea: number) {
+            var i = 2;
+            var textAreaHeight = area_to_fit_in.height() * percentageOfArea;
+            var textAreaWidth = area_to_fit_in.width() * percentageOfArea;
+            //now scale the text based on the width / height                
+            var txtHeight = this.metricTextElement.node().getBBox().height;
+            var txtWidth = this.metricTextElement.node().getBBox().width;
+            //artifically constrain it to do only 19 loops, so maximum is 19em
+            while ((txtHeight <= textAreaHeight && txtWidth <= textAreaWidth) && i < 20) {
+                this.metricTextElement.selectAll(".metricTxt")
+                                        .style("font-size", i + "em");
+                txtHeight = this.metricTextElement.node().getBBox().height;
+                txtWidth = this.metricTextElement.node().getBBox().width;
+                i++;
+            }
+            //now if either are greater reduce the text size
+            if (txtHeight > textAreaHeight || txtWidth > textAreaWidth) {
+                i--;
+                this.metricTextElement.selectAll(".metricTxt")
+                                        .style("font-size", i + "em");
+                txtHeight = this.metricTextElement.node().getBBox().height;
+                txtWidth = this.metricTextElement.node().getBBox().width;
+            }
         }
 
         private static parseSettings(dataView: DataView): VisualSettings {

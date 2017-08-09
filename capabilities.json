@@ -29,6 +29,13 @@
                         "bool": true
                     }
                 },
+                "percentageOfArea": {
+                    "displayName": "Percentage of area",
+                    "description": "The percentage of the are the text should fill.",
+                    "type": {
+                        "numeric": true
+                    }
+                },
                 "fontSize": {
                     "displayName": "Text size",
                     "type": {
@@ -253,6 +260,28 @@
                         "formatting": {
                             "fontSize": true
                         }   
+                    }
+                }
+            }
+        },
+        "headerWhenSmallSettings": {
+            "displayName": "Header - when small",
+            "properties": {
+                "show": {
+                    "type": {
+                        "bool": true
+                    }
+                },
+                "threshold": {
+                    "displayName": "Threshold",
+                    "type": {
+                        "numeric": true
+                    }
+                },
+                "numberOfCharacters": {
+                    "displayName": "Number of characters",
+                    "type": {
+                        "numeric": true
                     }
                 }
             }
