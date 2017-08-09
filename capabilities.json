@@ -240,14 +240,6 @@
                         ]
                     }
                 },
-                "alignHorizontal": {
-                    "displayName": "Align - Horizontal",
-                    "type": {
-                        "formatting": {
-                            "alignment": true
-                        }
-                    }
-                },
                 "value": {
                     "displayName": "Label",
                     "type":{

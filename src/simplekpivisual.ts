@@ -223,6 +223,8 @@ module powerbi.extensibility.visual {
             } else {
                 var data = transform.data;
                 
+                var fontFamily = "'Segoe UI', 'wf_segoe-ui_normal', helvetica, arial, sans-serif;";
+
                 //now if the target has been set to be defined in the settings we need to update it
                 if (this.settings.targetSettings.defineTarget) {
                     if (data.target == null) {
@@ -270,7 +272,8 @@ module powerbi.extensibility.visual {
                                 .classed("headerText",true)
                                 .text(label);
 
-                    header.style("font-size",font_size + "pt");
+                    header.style("font-size",font_size + "pt")
+                          .style("font-family",fontFamily);
                     
                     var position = this.settings.headerSettings.position;
                     var headerArea = this.position_header(position);
@@ -309,7 +312,7 @@ module powerbi.extensibility.visual {
                                         .append("text")
                                         .classed("metricTxt",true) 
                                         .text(data.value.toString(true, true))
-                                        .style("font-family","'Segoe UI', 'wf_segoe-ui_normal', helvetica, arial, sans-serif;")
+                                        .style("font-family",fontFamily)
                                         .style("fill", stColor.fontColor)
                                         .style("font-size","1em");
                 
