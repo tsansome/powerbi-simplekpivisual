@@ -424,10 +424,7 @@ module powerbi.extensibility.visual {
 
         }
 
-        private position_header(position) : Area {           
-            
-            var horizontalAlign = this.settings.headerSettings.alignHorizontal;
-            
+        private position_header(position) : Area {                       
             var svgWidth = parseInt(this.svg.style("width"));
             var svgHeight = parseInt(this.svg.style("height"));
             
